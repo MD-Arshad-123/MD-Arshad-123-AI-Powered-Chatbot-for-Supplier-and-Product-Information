@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Supplier Product Chatbot</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f6f8;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .chat-input {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-input textarea {
+      width: 100%;
+      height: 100px;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+      font-size: 16px;
+      resize: none;
+    }
+
+    .chat-input button {
+      align-self: flex-end;
+      padding: 10px 20px;
+      border: none;
+      background-color: #3f51b5;
+      color: white;
+      font-weight: bold;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .chat-input button:disabled {
+      background-color: #ddd;
+      cursor: not-allowed;
+    }
+
+    .chat-history {
+      margin-top: 20px;
+    }
+
+    .chat-history ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .chat-history li {
+      background-color: #f9f9f9;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+    }
+
+    .chat-history .query {
+      font-weight: bold;
+    }
+
+    .chat-history .response {
+      margin-top: 8px;
+    }
+
+    .timestamp {
+      font-size: 12px;
+      color: #888;
+      margin-top: 8px;
+    }
+
+    .loader {
+      text-align: center;
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <h1>Supplier Product Chatbot</h1>
+
+    <!-- Query Input Area -->
+    <div class="chat-input">
+      <textarea id="queryInput" placeholder="Ask about products or suppliers..."></textarea>
+      <button id="submitButton" onclick="submitQuery()">Ask</button>
+    </div>
+
+    <!-- Loader -->
+    <div id="loader" class="loader" style="display:none;">
+      <i class="fas fa-spinner fa-spin"></i> Loading...
+    </div>
+
+    <!-- Response Display -->
+    <div id="responseArea" style="display:none;">
+      <h3>Response:</h3>
+      <pre id="responseText"></pre>
+    </div>
+
+    <!-- Query History -->
+    <div class="chat-history">
+      <h3>Query History</h3>
+      <ul id="historyList"></ul>
+    </div>
+  </div>
+
+  <script>
+    let queryHistory = [];
+
+    function submitQuery() {
+      const queryInput = document.getElementById('queryInput');
+      const submitButton = document.getElementById('submitButton');
+      const loader = document.getElementById('loader');
+      const responseArea = document.getElementById('responseArea');
+      const responseText = document.getElementById('responseText');
+      const historyList = document.getElementById('historyList');
+
+      const query = queryInput.value.trim();
+      if (!query) return;
+
+      // Disable input and button during loading
+      submitButton.disabled = true;
+      queryInput.disabled = true;
+
+      // Show loading spinner
+      loader.style.display = 'block';
+
+      // Mock API request delay
+      setTimeout(() => {
+        const response = generateResponse(query);
+
+        // Update response area
+        responseText.textContent = response;
+        responseArea.style.display = 'block';
+
+        // Add query and response to history
+        queryHistory.push({
+          query: query,
+          response: response,
+          timestamp: new Date().toLocaleString()
+        });
+
+        // Render history list
+        renderHistory();
+
+        // Clear input fields
+        queryInput.value = '';
+        submitButton.disabled = false;
+        queryInput.disabled = false;
+        loader.style.display = 'none';
+      }, 2000); // Simulate network delay
+    }
+
+    function generateResponse(query) {
+      // Define responses to different queries
+      const responses = {
+        'What is the price of product X?': 'The price of product X is $100.',
+        'Who are the suppliers for product Y?': 'The suppliers for product Y are ABC Corp and XYZ Ltd.',
+        'How long does delivery take for product Z?': 'Delivery for product Z takes approximately 5-7 business days.',
+        'Is product A available in stock?': 'Yes, product A is currently in stock.'
+      };
+
+      // Return the response if it matches a predefined query, otherwise return a default response
+      return responses[query] || 'Sorry, I do not have information on that product.';
+    }
+
+    function renderHistory() {
+      const historyList = document.getElementById('historyList');
+      historyList.innerHTML = ''; // Clear existing history
+
+      queryHistory.slice().reverse().forEach(item => {
+        const listItem = document.createElement('li');
+        listItem.innerHTML = `
+          <div class="query">Query: ${item.query}</div>
+          <div class="response">Response: ${item.response}</div>
+          <div class="timestamp">${item.timestamp}</div>
+        `;
+        historyList.appendChild(listItem);
+      });
+    }
+  </script>
+</body>
+</html>
